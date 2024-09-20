@@ -105,8 +105,14 @@ Un Dockerfile es un archivo de texto que contiene una serie de instrucciones que
     ```
 
 5. **CMD o ENTRYPOINT:** Define el comando que se ejcutara cuando se inicie el contenedor. `CMD` puede ser reemplazado si se pasa un comando al ejecutar el contenedor, mientras que `ENTRYPOINT` no
+    ```Dockerfile
+        CMD ["php-fpm"]
+    ```
 
 6. **EXPOSE:** Expone un puerto del contenedor para que pueda ser accedido externamente
+    ```
+        EXPOSE 9000
+    ```
 
 ### Ejemplo de un Dockerfile para una aplicacion PHP:
 ```Dockerfile
