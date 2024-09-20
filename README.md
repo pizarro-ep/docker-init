@@ -222,97 +222,99 @@ El archivo docker-compose.yml es un archivo de configuración utilizado por Dock
 A continuación vamos a crear una app simple en el que ejecutaremos php y lo desplegaremos en un servidor nginx para poder visualizarlo en el navegador
 
 ### 1. Creamos el archivo docker-compose.yml
-    Creamos un archivo `docker-compose` para simplificar la configuración
-    - Definimos la versión
+Creamos un archivo `docker-compose` para simplificar la configuración
 
-    ```yaml
-        version: '3.8'
-    ```
+- Definimos la versión
+```yaml
+    version: '3.8'
+```
 
-    - Definimos los servicios: para nuestro caso serian 2, uno para el servidor de nginx y otro para php
+- Definimos los servicios: para nuestro caso serian 2:
 
-    ```yaml
+Servicio par nginx
+```yaml
+    web:
+        image: nginx:alpine
+        ports:
+            - "8080:80"
+        volumes:
+            - ".:/var/www/html"
+        depends_on:
+            - php
+```
+
+Servico para php
+```yaml
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - .:/var/www/html
+```
+
+Completo quedaría así:
+```yaml
+    version: '3.8'
+
+    services:
         web:
             image: nginx:alpine
             ports:
                 - "8080:80"
             volumes:
-                - ".:/var/www/html"
+                - .:/var/www/html
             depends_on:
                 - php
-    ```
 
-    ```yaml
         php:
             build:
                 context: .
                 dockerfile: Dockerfile
             volumes:
                 - .:/var/www/html
-    ```
-
-    Completo quedaría así:
-
-    ```yaml
-        version: '3.8'
-
-        services:
-            web:
-                image: nginx:alpine
-                ports:
-                    - "8080:80"
-                volumes:
-                    - .:/var/www/html
-                depends_on:
-                    - php
-
-            php:
-                build:
-                    context: .
-                    dockerfile: Dockerfile
-                volumes:
-                    - .:/var/www/html
-    ```
+```
 
 ### 2. Creamos un archivo nginx.conf
-    Creamos un archivo de configuracion Nginx. Puedes crear un archivo llamado `nginx.conf`
+Creamos un archivo de configuracion Nginx. Puedes crear un archivo llamado `nginx.conf`
 
-    ```nginx
-        server {
-            listen 80;
-            server_name localhost;
+```nginx
+    server {
+        listen 80;
+        server_name localhost;
 
-            root /var/www/html;
-            index index.php index.html;
+        root /var/www/html;
+        index index.php index.html;
 
-            location / {
-                try_files $uri $uri/ /index.php?$query_string;
-            }
-
-            location ~ \.php$ {
-                include fastcgi_params;
-                fastcgi_pass php:9000;
-                fastcgi_index index.php;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            }
+        location / {
+            try_files $uri $uri/ /index.php?$query_string;
         }
-    ```
+
+        location ~ \.php$ {
+            include fastcgi_params;
+            fastcgi_pass php:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+    }
+```
 
 ### 3. Actualizamos el docker-compose.yml
-    Agregamos el archivo de configuración
+Agregamos el archivo de configuración
 
-    ```yaml
-        web:
-            # ... otras configuraciones
-            volumes:
-                - ./nginx.conf:/etc/conf.d/default.conf
-                - .:/var/www/html
-            # ... otras configuraciones
+```yaml
+    web:
+        # ... otras configuraciones
+        volumes:
+            - ./nginx.conf:/etc/conf.d/default.conf
+            - .:/var/www/html
+        # ... otras configuraciones
 
-    ```
+```
 
 ### 4. Ejecutamos el contendor
-    ```bash
-        docker-compose up --build
-    ```
+```bash
+    docker-compose up --build
+```
+
 **De esta forma hemos creado una pequeña app con docker que usa php en un servidor nginx**
