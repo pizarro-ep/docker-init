@@ -110,7 +110,7 @@ Un Dockerfile es un archivo de texto que contiene una serie de instrucciones que
     ```
 
 6. **EXPOSE:** Expone un puerto del contenedor para que pueda ser accedido externamente
-    ```
+    ```Dockerfile
         EXPOSE 9000
     ```
 
